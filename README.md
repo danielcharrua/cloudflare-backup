@@ -1,6 +1,6 @@
-# cloudflare-backup
+<p align="center"><img src="/art/socialcard.png" alt="Social Card of Laravel Nice Error Pages"></p>
 
-Simple tool for backing up your CloudFlare hosted DNS records
+Simple console tool for backing up your CloudFlare hosted DNS records.
 
 ## Installation
 
@@ -47,3 +47,6 @@ docker run \
 ### Synology DSM (with Docker)
 
 You can use this package with Synology DSM after installing docker and adding the docker image. When running the container from DSM you can add the ENV variables, mount the volume and the restart policy.
+
+---
+*Note: This package is a fork of [rmg/cloudflare-backup](https://github.com/rmg/cloudflare-backup). Originally created by Ryan Graham.*
