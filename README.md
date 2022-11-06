@@ -15,7 +15,7 @@ email address and API key, respectively, and run `cf-backup`. All of the DNS
 records for all of your zones will be dumped to stdout in a BIND compatible
 format.
 
-`CF_EMAIL=admin@domain CF_TOKEN=xxx cf-backup > zones.bind.txt`
+`CF_EMAIL=<cf-account-email-address> CF_TOKEN=<cf-account-global-api-key> cf-backup > zones.bind.txt`
 
 ### Docker
 
@@ -26,8 +26,8 @@ The output txt file will be placed on `/app` directory.
 ```
 docker run \
     --name cloudflare-backup \
-    --env 'CF_EMAIL=<cloudFlare-account-email-address>' \
-    --env 'CF_TOKEN=<cloudFlare-account-global-api-key>' \
+    --env 'CF_EMAIL=<cf-account-email-address>' \
+    --env 'CF_TOKEN=<cf-account-global-api-key>' \
     --restart=always \
     cloudflare-backup
 ```
@@ -38,8 +38,8 @@ For data persistency of the output file create a volume and mount it in `/storag
 docker run \
     --name cloudflare-backup \
     --volume /var/docker-data/cloudflare-backup:/storage \
-    --env 'CF_EMAIL=<cloudFlare-account-email-address>' \
-    --env 'CF_TOKEN=<cloudFlare-account-global-api-key>' \
+    --env 'CF_EMAIL=<cf-account-email-address>' \
+    --env 'CF_TOKEN=<cf-account-global-api-key>' \
     --restart=always \
     cloudflare-backup
 ```
@@ -48,5 +48,7 @@ docker run \
 
 You can use this package with Synology DSM after installing docker and adding the docker image. When running the container from DSM you can add the ENV variables, mount the volume and the restart policy.
 
----
-*Note: This package is a fork of [rmg/cloudflare-backup](https://github.com/rmg/cloudflare-backup). Originally created by Ryan Graham.*
+## Credits
+
+Special thanks to [🦊🥕 Satoshiba 🔑⚡️](https://twitter.com/satoshiba21) for the help with Docker.
+*This package is a fork of [rmg/cloudflare-backup](https://github.com/rmg/cloudflare-backup). Originally created by Ryan Graham.*
