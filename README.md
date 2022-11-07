@@ -56,4 +56,4 @@ Special thanks to [🦊🥕 Satoshiba 🔑⚡️](https://twitter.com/satoshiba2
 ## Send some love
 
 If you find this package usefull consider sending some sats using the Lightning Network ⚡️
-<p align="center"><a href="lightning:LNURL1DP68GURN8GHJ7MRWW3UXYMM59E3K7MF09EMK2MRV944KUMMHDCHKCMN4WFK8QTMYV9HXJETVWP3K7UM5V9ES4MRMQW"><img width="180" src="/art/qr-lnurl.svg" alt="Social Card of Laravel Nice Error Pages"></a></p>
+<p align="center"><a href="lightning:LNURL1DP68GURN8GHJ7MRWW3UXYMM59E3K7MF09EMK2MRV944KUMMHDCHKCMN4WFK8QTMYV9HXJETVWP3K7UM5V9ES4MRMQW"><img width="180" src="/art/qr-lnurl.svg" alt="qr-lnurl"></a></p>
