@@ -52,3 +52,8 @@ You can use this package with Synology DSM after installing docker and adding th
 
 Special thanks to [🦊🥕 Satoshiba 🔑⚡️](https://twitter.com/satoshiba21) for the help with Docker.
 *This package is a fork of [rmg/cloudflare-backup](https://github.com/rmg/cloudflare-backup). Originally created by Ryan Graham.*
+
+## Send some love
+
+If you find this package usefull consider sending some sats using the Lightning Network ⚡️
+<p align="center"><a href="lightning:LNURL1DP68GURN8GHJ7MRWW3UXYMM59E3K7MF09EMK2MRV944KUMMHDCHKCMN4WFK8QTMYV9HXJETVWP3K7UM5V9ES4MRMQW"><img width="150" src="/art/qr-lnurl.svg" alt="Social Card of Laravel Nice Error Pages"></a></p>
