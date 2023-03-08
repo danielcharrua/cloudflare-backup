@@ -6,6 +6,7 @@ var qs = require('querystring');
 
 var email = process.env.CF_EMAIL;
 var token = process.env.CF_TOKEN;
+
 if (!email || !token) {
   console.error('CF_EMAIL and CF_TOKEN must be set');
   return process.exit(1);
@@ -33,6 +34,7 @@ function dumpZone(zone) {
   });
 }
 
+// https://developers.cloudflare.com/dns/manage-dns-records/how-to/import-and-export/#dns-record-attributes
 function bindFormat(rec) {
   var content = rec.content;
   switch(rec.type) {
@@ -46,6 +48,9 @@ function bindFormat(rec) {
     case 'MX':
       content = fmt('%d\t%s.', rec.priority, content);
       break;
+  }
+  if (rec.comment != null){
+    return fmt('%s.\t%d\tIN\t%s\t%s ; %s', rec.name, rec.ttl, rec.type, content, rec.comment);
   }
   return fmt('%s.\t%d\tIN\t%s\t%s', rec.name, rec.ttl, rec.type, content);
 }
