@@ -30,6 +30,9 @@ jobs:
             type=ref,event=branch
             type=ref,event=pr
             type=semver,pattern={{version}}
+          # I always want to have the latest tag attached to this image
+          flavor: |
+            latest=auto
       -
         name: Set up QEMU 
         uses: docker/setup-qemu-action@v2
@@ -49,5 +52,6 @@ jobs:
         with:
           context: .
           push: ${{ github.event_name != 'pull_request' }}
+          platforms: linux/amd64,linux/arm64/v8
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
