@@ -27,4 +27,4 @@ build/Release
 node_modules
 
 # Mac
-.DS_Storage
+.DS_Store
