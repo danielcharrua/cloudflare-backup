@@ -15,7 +15,9 @@ email address and API key, respectively, and run `cf-backup`. All of the DNS
 records for all of your zones will be dumped to stdout in a BIND compatible
 format. It also saves zone's comments ✌️
 
-`CF_EMAIL=<cf-account-email-address> CF_TOKEN=<cf-account-global-api-key> cf-backup > zones.bind.txt`
+```
+CF_EMAIL=<cf-account-email-address> CF_TOKEN=<cf-account-global-api-key> cf-backup > zones.bind.txt
+```
 
 ### Docker
 
