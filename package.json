@@ -1,6 +1,6 @@
 {
   "name": "cloudflare-backup",
-  "version": "1.1.0",
+  "version": "1.0.1",
   "description": "Simple tool for backing up your CloudFlare hosted DNS records",
   "main": "bin/cf-backup.js",
   "scripts": {},
@@ -16,7 +16,14 @@
     "bind",
     "dns"
   ],
-  "author": "Daniel Pereyra Costas <hola@charrua.es>",
+  "author": "Ryan Graham <r.m.graham@gmail.com>",
+  "contributors": [
+    {
+      "name" : "Daniel Pereyra Costas",
+      "email" : "hola@charrua.es",
+      "url" : "https://charrua.es/"
+    }
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/danielcharrua/cloudflare-backup/issues"
