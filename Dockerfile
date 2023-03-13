@@ -7,7 +7,7 @@ RUN apk add --no-cache bash
 COPY backup.sh .
 
 # Install all the service node dependencies
-RUN npm install -g cloudflare-backup
+RUN npm install -g danielcharrua/cloudflare-backup
 
 # Add crontab entry to run all days at 2AM
 RUN echo "0 2 * * * /bin/bash /app/backup.sh" >> /var/spool/cron/crontabs/root
