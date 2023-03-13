@@ -1,11 +1,14 @@
 FROM node:lts-alpine3.17
 WORKDIR /app
 
+# Define how many days to retain backup
+ENV BACKUP_DAYS=180
+
 # Install bash for using terminal from DSM
 RUN apk add --no-cache bash
 
 # Install git for using custom npm package
-RUN apk add --update git
+RUN apk add --no-cache git
 
 COPY backup.sh .
 

@@ -32,14 +32,31 @@ docker run \
     danielpcostas/cloudflare-backup
 ```
 
-For data persistency of the output file create a volume and mount it in `/storage`. In this case the output txt file will be placed on `/var/docker-data/cloudflare-backup`. Change this route to the one you use on your filesystem.
+#### Data persistency
+
+For data persistency of the output file create a volume and mount it in `/storage`. In this case the output txt file will be placed on `/home/username/cloudflare-backup`. Change this route to match some folder on your filesystem.
 
 ```
 docker run \
     --name cloudflare-backup \
-    --volume /var/docker-data/cloudflare-backup:/storage \
+    --volume /home/username/cloudflare-backup:/storage \
     --env 'CF_EMAIL=<cf-account-email-address>' \
     --env 'CF_TOKEN=<cf-account-global-api-key>' \
+    --restart=always \
+    danielpcostas/cloudflare-backup
+```
+
+#### Auto delete backups
+
+By default the backup zones files will be persisted for 6 months (180 days). This will give you plenty of time to have and manage old records. You can customize this value to fit your needs.
+
+```
+docker run \
+    --name cloudflare-backup \
+    --volume /home/username/cloudflare-backup:/storage \
+    --env 'CF_EMAIL=<cf-account-email-address>' \
+    --env 'CF_TOKEN=<cf-account-global-api-key>' \
+    --env 'BACKUP_DAYS=365' \
     --restart=always \
     danielpcostas/cloudflare-backup
 ```
