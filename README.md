@@ -4,7 +4,7 @@ Simple console tool for backing up your CloudFlare hosted DNS records.
 
 ## Installation
 
-`npm install -g cloudflare-backup`
+`npm install -g danielcharrua/cloudflare-backup`
 
 ## Usage
 
@@ -44,16 +44,15 @@ docker run \
     danielpcostas/cloudflare-backup
 ```
 
-### Synology DSM (with Docker)
+### NAS (with Docker)
 
-You can use this package with Synology DSM after installing docker and adding the docker image. When running the container from DSM you can add the ENV variables, mount the volume and the restart policy.
+You can use this package with with your NAS after installing docker and adding the docker image. When running the container you can add the `.env` variables, mount the volume and the restart policy.
 
 ## Credits
 
 Special thanks to [🦊🥕 Satoshiba 🔑⚡️](https://twitter.com/satoshiba21) for the help with Docker.<br />
-*This package is a fork of [rmg/cloudflare-backup](https://github.com/rmg/cloudflare-backup). Originally created by Ryan Graham.*
+This package is a fork of [rmg/cloudflare-backup](https://github.com/rmg/cloudflare-backup). Originally created by Ryan Graham.
 
 ## Send some love
 
-If you find this package usefull consider sending some sats using the Lightning Network ⚡️ to
-<a href="lightning:danielpcostas@getalby.com">danielpcostas@getalby.com</a>
+To keep working and maintainig this free package [please consider buying me a coffee](https://charrua.es/donaciones). Thank you ✌️
