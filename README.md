@@ -2,6 +2,8 @@
 
 Simple console tool for backing up your CloudFlare hosted DNS records.
 
+[🇪🇸 Spanish guide here](https://charrua.es/blog/automatiza-backups-dns-cloudflare/).
+
 ## Installation
 
 `npm install -g danielcharrua/cloudflare-backup`
