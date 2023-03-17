@@ -2,9 +2,11 @@
 
 Simple console tool for backing up your CloudFlare hosted DNS records.
 
+[🇪🇸 Spanish guide here](https://charrua.es/blog/automatiza-backups-dns-cloudflare/).
+
 ## Installation
 
-`npm install -g cloudflare-backup`
+`npm install -g danielcharrua/cloudflare-backup`
 
 ## Usage
 
@@ -34,28 +36,44 @@ docker run \
     danielpcostas/cloudflare-backup
 ```
 
-For data persistency of the output file create a volume and mount it in `/storage`. In this case the output txt file will be placed on `/var/docker-data/cloudflare-backup`. Change this route to the one you use on your filesystem.
+#### Data persistency
+
+For data persistency of the output file create a volume and mount it in `/storage`. In this case the output txt file will be placed on `/home/username/cloudflare-backup`. Change this route to match some folder on your filesystem.
 
 ```
 docker run \
     --name cloudflare-backup \
-    --volume /var/docker-data/cloudflare-backup:/storage \
+    --volume /home/username/cloudflare-backup:/storage \
     --env 'CF_EMAIL=<cf-account-email-address>' \
     --env 'CF_TOKEN=<cf-account-global-api-key>' \
     --restart=always \
     danielpcostas/cloudflare-backup
 ```
 
-### Synology DSM (with Docker)
+#### Auto delete backups
 
-You can use this package with Synology DSM after installing docker and adding the docker image. When running the container from DSM you can add the ENV variables, mount the volume and the restart policy.
+By default the backup zones files will be persisted for 6 months (180 days). This will give you plenty of time to have and manage old records. You can customize this value to fit your needs.
+
+```
+docker run \
+    --name cloudflare-backup \
+    --volume /home/username/cloudflare-backup:/storage \
+    --env 'CF_EMAIL=<cf-account-email-address>' \
+    --env 'CF_TOKEN=<cf-account-global-api-key>' \
+    --env 'BACKUP_DAYS=365' \
+    --restart=always \
+    danielpcostas/cloudflare-backup
+```
+
+### NAS (with Docker)
+
+You can use this package with with your NAS after installing docker and adding the docker image. When running the container you can add the `.env` variables, mount the volume and the restart policy.
 
 ## Credits
 
 Special thanks to [🦊🥕 Satoshiba 🔑⚡️](https://twitter.com/satoshiba21) for the help with Docker.<br />
-*This package is a fork of [rmg/cloudflare-backup](https://github.com/rmg/cloudflare-backup). Originally created by Ryan Graham.*
+This package is a fork of [rmg/cloudflare-backup](https://github.com/rmg/cloudflare-backup). Originally created by Ryan Graham.
 
 ## Send some love
 
-If you find this package usefull consider sending some sats using the Lightning Network ⚡️ to
-<a href="lightning:danielpcostas@getalby.com">danielpcostas@getalby.com</a>
+To keep working and maintainig this free package [please consider buying me a coffee](https://charrua.es/donaciones). Thank you ✌️
