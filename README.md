@@ -10,16 +10,34 @@ Simple console tool for backing up your CloudFlare hosted DNS records.
 
 ## Usage
 
+### Credentials
+
+Two ways to authenticate. **Prefer a scoped API token.**
+
+**API token (recommended).** In the CloudFlare dashboard: *My Profile → API Tokens → Create Token → Create Custom Token*. Give it only:
+
+- Permissions: **Zone → Zone → Read** and **Zone → DNS → Read**
+- Zone Resources: **Include → All zones from all accounts**, so zones in client accounts you have access to are covered too
+
+Then set `CF_API_TOKEN`. Nothing else is needed — the token identifies you on its own.
+
+**Global API Key (legacy).** Set `CF_EMAIL` and `CF_TOKEN`. This key grants full control of your entire account — every zone, SSL, billing — so only use it if a scoped token is not an option.
+
 ### Local machine
 
-Set `CF_EMAIL` and `CF_TOKEN` environment variables to your CloudFlare account
-email address and API key, respectively, and run `cf-backup`. All of the DNS
-records for all of your zones will be dumped to stdout in a BIND compatible
-format. It also saves zone's comments ✌️
+Every DNS record of every zone the credential can reach is dumped to stdout in a BIND compatible format, grouped by account and sorted by name, so two backups can be diffed to see what changed. It also saves zone's comments ✌️
+
+```
+CF_API_TOKEN=<cf-api-token> cf-backup > zones.bind.txt
+```
+
+Or with the legacy key:
 
 ```
 CF_EMAIL=<cf-account-email-address> CF_TOKEN=<cf-account-global-api-key> cf-backup > zones.bind.txt
 ```
+
+On failure the reason goes to stderr and the exit code is non-zero, with stdout left empty. The tool never exits successfully with an empty dump, so a rejected or under-permissioned credential cannot quietly produce an empty backup file.
 
 ### Docker
 
@@ -30,8 +48,7 @@ The output txt file will be placed on `/app` directory.
 ```
 docker run \
     --name cloudflare-backup \
-    --env 'CF_EMAIL=<cf-account-email-address>' \
-    --env 'CF_TOKEN=<cf-account-global-api-key>' \
+    --env 'CF_API_TOKEN=<cf-api-token>' \
     --restart=always \
     danielpcostas/cloudflare-backup
 ```
@@ -44,8 +61,7 @@ For data persistency of the output file create a volume and mount it in `/storag
 docker run \
     --name cloudflare-backup \
     --volume /home/username/cloudflare-backup:/storage \
-    --env 'CF_EMAIL=<cf-account-email-address>' \
-    --env 'CF_TOKEN=<cf-account-global-api-key>' \
+    --env 'CF_API_TOKEN=<cf-api-token>' \
     --restart=always \
     danielpcostas/cloudflare-backup
 ```
@@ -58,8 +74,7 @@ By default the backup zones files will be persisted for 6 months (180 days). Thi
 docker run \
     --name cloudflare-backup \
     --volume /home/username/cloudflare-backup:/storage \
-    --env 'CF_EMAIL=<cf-account-email-address>' \
-    --env 'CF_TOKEN=<cf-account-global-api-key>' \
+    --env 'CF_API_TOKEN=<cf-api-token>' \
     --env 'BACKUP_DAYS=365' \
     --restart=always \
     danielpcostas/cloudflare-backup

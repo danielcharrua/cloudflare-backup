@@ -4,26 +4,80 @@ var fmt = require('util').format;
 var https = require('https');
 var qs = require('querystring');
 
+// Two ways to authenticate, in order of preference:
+//
+//   CF_API_TOKEN         a scoped API token, sent as `Authorization: Bearer`.
+//                        Create it with Zone:Read + DNS:Read and nothing else.
+//                        To cover client accounts too, scope its resources to
+//                        "All zones from all accounts".
+//   CF_EMAIL + CF_TOKEN  the legacy Global API Key. It grants full control of
+//                        the entire account — every zone, SSL, billing — so
+//                        prefer a scoped token wherever you can.
+var apiToken = process.env.CF_API_TOKEN;
 var email = process.env.CF_EMAIL;
 var token = process.env.CF_TOKEN;
 
-if (!email || !token) {
-  console.error('CF_EMAIL and CF_TOKEN must be set');
+var authHeaders;
+if (apiToken) {
+  authHeaders = { 'Authorization': 'Bearer ' + apiToken };
+} else if (email && token) {
+  authHeaders = { 'X-Auth-Email': email, 'X-Auth-Key': token };
+} else {
+  console.error('Set CF_API_TOKEN (a scoped API token with Zone:Read and DNS:Read),');
+  console.error('or CF_EMAIL and CF_TOKEN for the legacy Global API Key.');
   return process.exit(1);
 }
 
 getZones(function(err, zones) {
   if (err) {
-    return console.error(err);
+    return fail('Error listing zones', err);
   }
-  zones.forEach(dumpZone);
+  if (!zones.length) {
+    return fail('No zones returned', new Error('the credential can see nothing to back up'));
+  }
+
+  // /zones spans every account the credential can reach, so group by account
+  // and sort. Stable ordering makes two backups diffable, which is how you spot
+  // what changed between one night and the next.
+  zones.sort(function(a, b) {
+    var accA = accountName(a), accB = accountName(b);
+    if (accA !== accB) return accA < accB ? -1 : 1;
+    return a.name < b.name ? -1 : (a.name > b.name ? 1 : 0);
+  });
+
+  dumpNext(0);
+
+  // One zone at a time. Slower than firing every request at once, but the
+  // output keeps the order above instead of arriving as responses happen.
+  function dumpNext(i) {
+    if (i >= zones.length) {
+      return;
+    }
+    dumpZone(zones[i], function() {
+      dumpNext(i + 1);
+    });
+  }
 });
 
-function dumpZone(zone) {
+// Exit non-zero and say why, on stderr. A backup that failed must never look
+// like a backup that found nothing: whoever runs this (cron, a wrapper script)
+// is the only witness, and it only sees the exit code and stderr.
+function fail(context, err) {
+  console.error('%s: %s', context, err && err.message ? err.message : err);
+  process.exitCode = 1;
+}
+
+function accountName(zone) {
+  return (zone.account && zone.account.name) || 'unknown-account';
+}
+
+function dumpZone(zone, done) {
   allPages('/zones/' + zone.id + '/dns_records', function(err, recs) {
     if (err) {
-      return console.error('Error getting zone records for %s:', zid, err);
+      fail(fmt('Error getting records for zone %s', zone.name), err);
+      return done();
     }
+    console.log(';; Account: %s', accountName(zone));
     console.log(';; Domain: %s', zone.name);
     console.log(';; Exported: %s', new Date());
     console.log('$ORIGIN %s.', zone.name);
@@ -31,6 +85,7 @@ function dumpZone(zone) {
       console.log(bindFormat(rec));
     });
     console.log('\n');
+    done();
   });
 }
 
@@ -96,19 +151,22 @@ function hasMorePages(info) {
 }
 
 function cfReq(path, params, callback) {
+  var headers = { 'User-Agent': 'cloudflare-backup' };
+  Object.keys(authHeaders).forEach(function(k) {
+    headers[k] = authHeaders[k];
+  });
+
   var opts = {
     host: 'api.cloudflare.com',
     port: 443,
     path: '/client/v4' + path + '?' + qs.stringify(params),
-    headers: {
-      'X-Auth-Email': email,
-      'X-Auth-Key': token,
-    },
+    headers: headers,
     method: 'GET',
   };
   var req = https.request(opts, function(res) {
     return JSONResponse(res, callback);
   });
+  req.on('error', callback);
   req.end();
   return req;
 }
@@ -125,12 +183,31 @@ function JSONResponse(res, callback) {
   }
 
   function parse() {
-    var err = null;
+    var parsed;
     try {
-      body = JSON.parse(body);
+      parsed = JSON.parse(body);
     } catch (e) {
-      err = e;
+      return callback(new Error(fmt('HTTP %d, unparseable response: %s', res.statusCode, body.slice(0, 200))));
     }
-    callback(err, body);
+
+    // Without these two checks a rejected credential yields an empty result set
+    // and the tool exits 0, writing an empty backup file that looks fine.
+    if (res.statusCode < 200 || res.statusCode >= 300) {
+      return callback(new Error(fmt('HTTP %d — %s', res.statusCode, apiErrors(parsed))));
+    }
+    if (parsed.success === false) {
+      return callback(new Error(apiErrors(parsed)));
+    }
+
+    callback(null, parsed);
   }
+}
+
+function apiErrors(parsed) {
+  if (parsed && Array.isArray(parsed.errors) && parsed.errors.length) {
+    return parsed.errors.map(function(e) {
+      return fmt('%s (code %s)', e.message, e.code);
+    }).join('; ');
+  }
+  return 'no error detail returned';
 }
