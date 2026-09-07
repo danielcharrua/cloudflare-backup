@@ -13,6 +13,17 @@ var qs = require('querystring');
 //   CF_EMAIL + CF_TOKEN  the legacy Global API Key. It grants full control of
 //                        the entire account — every zone, SSL, billing — so
 //                        prefer a scoped token wherever you can.
+// Piping into `head` or `less` closes stdout early. Without this, the writes
+// still in flight raise EPIPE and the tool dies with a stack trace and a
+// non-zero exit — which, since a non-zero exit here means "the backup failed",
+// would be a false alarm.
+process.stdout.on('error', function(err) {
+  if (err.code === 'EPIPE') {
+    process.exit(0);
+  }
+  throw err;
+});
+
 var apiToken = process.env.CF_API_TOKEN;
 var email = process.env.CF_EMAIL;
 var token = process.env.CF_TOKEN;
@@ -95,7 +106,14 @@ function bindFormat(rec) {
   switch(rec.type) {
     case 'SPF':
     case 'TXT':
-      content = JSON.stringify(content);
+      // CloudFlare already returns TXT content quoted, and splits values longer
+      // than 255 chars into several quoted chunks ("part one" "part two").
+      // Quoting that again nests the quotes, so the exported record carries
+      // literal quote characters and restores wrong — which for SPF, DKIM and
+      // DMARC means mail breaks. Only quote what arrives unquoted.
+      if (!/^".*"$/.test(content)) {
+        content = JSON.stringify(content);
+      }
       break;
     case 'CNAME':
       content += '.';
