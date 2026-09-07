@@ -80,9 +80,30 @@ docker run \
     danielpcostas/cloudflare-backup
 ```
 
+#### Run once, scheduled from the host
+
+The examples above leave a container running so its internal cron can fire. If you already have a scheduler — a host crontab, a systemd timer — you can instead override the image's `CMD` and have the container start, dump and exit:
+
+```
+docker run --rm \
+    --env-file /path/to/cf.env \
+    danielpcostas/cloudflare-backup cf-backup > zones.bind.txt
+```
+
+Nothing idles between runs, the schedule stays visible where the rest of your jobs live rather than baked into the image, and it uses the host's clock — the container's cron runs on UTC, so a fixed hour there drifts against local time twice a year. Redirecting from the host shell also means the file belongs to the invoking user instead of to root inside the container, and no volume is needed.
+
+Keeping the credentials in an `--env-file` (mode `600`) rather than `--env` keeps the token out of `docker inspect` and out of your shell history.
+
+#### Image tags
+
+- `latest` and `1.2.0` — moved only when a `v*.*.*` tag is pushed. Use these.
+- `main` — rebuilt on every push to the default branch. Ahead of the last release, and not a stable target.
+
+Pushing to `main` does **not** move `latest`, so `docker pull danielpcostas/cloudflare-backup` keeps whatever the last released version was.
+
 ### NAS (with Docker)
 
-You can use this package with with your NAS after installing docker and adding the docker image. When running the container you can add the `.env` variables, mount the volume and the restart policy.
+You can use this package with your NAS after installing docker and adding the docker image. When running the container you can add the `.env` variables, mount the volume and the restart policy.
 
 ## Credits
 
