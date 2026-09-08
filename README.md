@@ -49,9 +49,11 @@ The output txt file will be placed on `/app` directory.
 docker run \
     --name cloudflare-backup \
     --env 'CF_API_TOKEN=<cf-api-token>' \
-    --restart=always \
+    --restart=unless-stopped \
     danielpcostas/cloudflare-backup
 ```
+
+`--restart=unless-stopped` rather than `--restart=always`: with `always`, a container you stopped by hand comes back on its own the next time the Docker daemon restarts — after a reboot, say — which makes the container surprisingly hard to retire. `unless-stopped` behaves the same in every other respect, but a manual stop sticks.
 
 #### Data persistency
 
@@ -62,7 +64,7 @@ docker run \
     --name cloudflare-backup \
     --volume /home/username/cloudflare-backup:/storage \
     --env 'CF_API_TOKEN=<cf-api-token>' \
-    --restart=always \
+    --restart=unless-stopped \
     danielpcostas/cloudflare-backup
 ```
 
@@ -76,7 +78,7 @@ docker run \
     --volume /home/username/cloudflare-backup:/storage \
     --env 'CF_API_TOKEN=<cf-api-token>' \
     --env 'BACKUP_DAYS=365' \
-    --restart=always \
+    --restart=unless-stopped \
     danielpcostas/cloudflare-backup
 ```
 
